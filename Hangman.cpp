@@ -1,16 +1,20 @@
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+#include <string>
 
 using namespace std;
 
+// Global Variables
 int MistakeCount = 0, GuessedChars = 0;
 char LetterArray[26] = {}; // Tracks guessed letters
 const string IncorrectGuess = " _ ";
 string OutStr = "";
 
+// Function Prototypes
 bool LetterCheck(char Guess);
 bool CheckingCharacter(string Country, char Guess, int CountryLength);
+void DrawHangman(int mistakes); // <--- NEW FUNCTION
 
 int main()
 {
@@ -49,20 +53,29 @@ int main()
         "ukraine", "united arab emirates", "united kingdom", "united states", "uruguay", "uzbekistan",
         "vanuatu", "vatican city", "venezuela", "vietnam", "yemen", "zambia", "zimbabwe"};
 
-    // Choose a random country and taje required values for code
-    srand(time(0));              // Initializes a random seed
-    RandomChoice = rand() % 195; // Random number between 0 and 194
+    // Choose a random country
+    srand(time(0));
+    RandomChoice = rand() % 195;
     Temp = Countries[RandomChoice];
     string Country = Temp;
     LengthCountry = Country.length();
 
-    cout << "Welcome to a game of HANG-MAN!" << endl;
+    // Special handling: If the country has spaces (like "united states"), 
+    // reveal them immediately so the user doesn't have to guess them.
+    OutStr = string(LengthCountry, '_');
+    for(int i=0; i < LengthCountry; i++) {
+        if(Country[i] == ' ') {
+            OutStr[i] = ' ';
+            GuessedChars++;
+        }
+    }
 
-    // Initial Output
-    OutStr = string(LengthCountry, '_'); // Write all underscores with the length of LengthCountry
-    cout << endl
-         << OutStr << endl
-         << endl;
+    cout << "Welcome to a game of HANG-MAN!" << endl;
+    
+    // Draw initial empty gallows
+    DrawHangman(MistakeCount);
+
+    cout << endl << OutStr << endl << endl;
 
     while (true)
     {
@@ -75,16 +88,28 @@ int main()
         if (UsedCheck)
         {
             cout << "You already guessed that letter!" << endl;
+            // We redraw here to keep the screen looking consistent
+            DrawHangman(MistakeCount);
+            cout << OutStr << endl;
             continue;
         }
 
-        // Check if the guess is in the country name If not, then Mistake Count is incremented and displayed
+        // Check guess
         GuessCheck = CheckingCharacter(Country, Guess, LengthCountry);
+        
         if (!GuessCheck)
         {
             MistakeCount++;
             cout << "Incorrect guess! Mistakes: " << MistakeCount << "/10" << endl;
         }
+        else 
+        {
+            cout << "Correct!" << endl;
+        }
+
+        // --- DISPLAY ART HERE ---
+        DrawHangman(MistakeCount);
+        // ------------------------
 
         // Checks if all characters have been guessed
         if (GuessedChars >= LengthCountry)
@@ -104,7 +129,7 @@ int main()
     return 0;
 }
 
-// Checks if the character is in the country and replaces it from every position in the country name
+// Checks if the character is in the country and replaces it from every position
 bool CheckingCharacter(string Country, char Guess, int LengthCountry)
 {
     bool Guessed = false;
@@ -132,4 +157,127 @@ bool LetterCheck(char Guess)
     }
     LetterArray[index++] = Guess; // Store guessed letter
     return false;
+}
+
+// Function to draw the ASCII Art based on MistakeCount
+void DrawHangman(int mistakes) {
+    // We use an array of strings. 
+    // "R" allows us to create Raw Strings so we don't have to use \n for every line.
+    
+    string stages[11] = {
+        // 0 Mistakes: Empty
+        R"(
+           
+              
+              
+              
+              
+        =========
+        )",
+        
+        // 1 Mistake: Base
+        R"(
+           
+              |
+              |
+              |
+              |
+        =========
+        )",
+
+        // 2 Mistakes: Pole
+        R"(
+              +
+              |
+              |
+              |
+              |
+        =========
+        )",
+
+        // 3 Mistakes: Top Bar
+        R"(
+           ---+
+              |
+              |
+              |
+              |
+        =========
+        )",
+        
+        // 4 Mistakes: Rope
+        R"(
+           ---+
+           |  |
+              |
+              |
+              |
+        =========
+        )",
+
+        // 5 Mistakes: Head
+        R"(
+           ---+
+           |  |
+           O  |
+              |
+              |
+        =========
+        )",
+
+        // 6 Mistakes: Body
+        R"(
+           ---+
+           |  |
+           O  |
+           |  |
+              |
+        =========
+        )",
+
+        // 7 Mistakes: Left Arm
+        R"(
+           ---+
+           |  |
+           O  |
+          /|  |
+              |
+        =========
+        )",
+
+        // 8 Mistakes: Right Arm
+        R"(
+           ---+
+           |  |
+           O  |
+          /|\ |
+              |
+        =========
+        )",
+
+        // 9 Mistakes: Left Leg
+        R"(
+           ---+
+           |  |
+           O  |
+          /|\ |
+          /   |
+        =========
+        )",
+
+        // 10 Mistakes: Right Leg (Dead)
+        R"(
+           ---+
+           |  |
+           O  |
+          /|\ |
+          / \ |
+        =========
+        )"
+    };
+
+    // Safety check to prevent crashing if mistakes go over 10
+    if (mistakes >= 0 && mistakes <= 10) {
+        cout << stages[mistakes] << endl;
+    }
 }
