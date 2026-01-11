@@ -14,7 +14,7 @@ string OutStr = "";
 // Function Prototypes
 bool LetterCheck(char Guess);
 bool CheckingCharacter(string Country, char Guess, int CountryLength);
-void DrawHangman(int mistakes); // <--- NEW FUNCTION
+void DrawHangman(int Mistakes); // <--- NEW FUNCTION
 
 int main()
 {
@@ -118,7 +118,7 @@ int main()
             break;
         }
 
-        // If number of mistakes exceed 10, Game is over
+        // If number of Mistakes exceed 10, Game is over
         if (MistakeCount >= 10)
         {
             cout << "Game over! The country was: " << Country << endl;
@@ -160,7 +160,7 @@ bool LetterCheck(char Guess)
 }
 
 // Function to draw the ASCII Art based on MistakeCount
-void DrawHangman(int mistakes) {
+void DrawHangman(int Mistakes) {
     // We use an array of strings. 
     // "R" allows us to create Raw Strings so we don't have to use \n for every line.
     
@@ -276,8 +276,8 @@ void DrawHangman(int mistakes) {
         )"
     };
 
-    // Safety check to prevent crashing if mistakes go over 10
-    if (mistakes >= 0 && mistakes <= 10) {
-        cout << stages[mistakes] << endl;
+    // Safety check to prevent crashing if Mistakes go over 10
+    if (Mistakes >= 0 && Mistakes <= 10) {
+        cout << stages[Mistakes] << endl;
     }
 }
